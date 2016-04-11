@@ -10,11 +10,10 @@ start_link(Value, LeaseTime) ->
   gen_server:start_link(?SERVER, [Value, LeaseTime], []).
 
 init([Value, LeaseTime]) ->
+  Now = calendar:local_time(),
   StartTime = calendar:datetime_to_gregorian_seconds(Now),
-  {ok, state#{value=Value,
+  {ok, #state{value = Value,
               lease_time = LeaseTime,
-              start_time = StartTime},
-   time_left(LeaseTime, StartTime)
-  }.
+              start_time = StartTime}}.
 
-time_left(LeaseTime, StartTime) ->
+%% time_left(LeaseTime, StartTime) ->
