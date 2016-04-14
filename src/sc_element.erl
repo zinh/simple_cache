@@ -12,7 +12,7 @@ start_link(Value, LeaseTime) ->
   gen_server:start_link(?SERVER, [Value, LeaseTime], []).
 
 create(Value) ->
-  supervisor:start_child(sc_sup, [Value, ?DEFAULT_LEASE_TIME]).
+  supervisor:start_child(sc_element_sup, [Value, ?DEFAULT_LEASE_TIME]).
 
 replace(Pid, Value) ->
   gen_server:cast(Pid, {replace, Value}).

@@ -12,7 +12,8 @@ register_with_logger() ->
 init([]) ->
   {ok, #state{}}.
 
-handle_event(_Event, State) ->
+handle_event({info_msg, _Gleader, {Pid, Format, Data}}, State) ->
+  io:fwrite("[INFO] <~p> ~s", [Pid, io_lib:format(Format, Data)]),
   {ok, State}.
 
 handle_call(_Request, State) ->

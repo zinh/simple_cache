@@ -2,6 +2,7 @@
 -export([insert/2, lookup/1]).
 
 insert(Key, Value) ->
+  sc_event:create(Key, Value),
   case sc_store:lookup(Key) of
     {ok, Pid} ->
       sc_element:replace(Pid, Value);
@@ -11,6 +12,7 @@ insert(Key, Value) ->
   end.
 
 lookup(Key) ->
+  sc_event:lookup(Key),
   case sc_store:lookup(Key) of
     {ok, Pid} ->
       sc_element:get_value(Pid);
