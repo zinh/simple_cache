@@ -1,6 +1,6 @@
 -module(sc_element).
 -behaviour(gen_server).
--export([start_link/2, create/1, replace/2, get_value/1]).
+-export([start_link/2, create/1, create/2, replace/2, get_value/1]).
 -export([init/1, handle_info/2, handle_call/3, handle_cast/2, code_change/3, terminate/2]).
 
 -define(DEFAULT_LEASE_TIME, (60*60*25)).
@@ -13,6 +13,9 @@ start_link(Value, LeaseTime) ->
 
 create(Value) ->
   supervisor:start_child(sc_element_sup, [Value, ?DEFAULT_LEASE_TIME]).
+
+create(Value, LeaseTime) ->
+  supervisor:start_child(sc_element_sup, [Value, LeaseTime]).
 
 replace(Pid, Value) ->
   gen_server:cast(Pid, {replace, Value}).
