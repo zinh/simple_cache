@@ -14,15 +14,21 @@ insert(Key, Pid) ->
   mnesia:dirty_write(sc_store, #sc_store{key=Key, pid=Pid}).
 
 lookup(Key) ->
-  case mnesia:read(sc_store, Key) of
-    [#{pid=Pid}] ->
+  case mnesia:dirty_read(sc_store, Key) of
+    [#sc_store{pid=Pid}] ->
       {ok, Pid};
     _ ->
       {error, not_found}
   end.
 
 delete(Pid) ->
-  ets:match_delete(?TABLE_ID, {'_', Pid}).
+  mnesia:transaction(fun() ->
+                         {atomic, Ids} = mnesia:select(sc_store, [#sc_store{key='$1'}, pid=Pid], [], ['$1']),
+                         lists:foreach(fun(Id) -> 
+                                           mnesia:delete({sc_store, Id})
+                                       end, Ids)
+                     end
+                    ).
 
 create_tables() ->
-  mnesia:create_table(sc_store, [{attributes, record_info(fields, sc_store)}]).
+  mnesia:create_table(sc_store, [{attributes, record_info(fields, sc_store)}, {index, [pid]}]).
