@@ -26,7 +26,8 @@ delete(Pid) ->
                                            mnesia:delete({sc_store, Id})
                                        end, Ids)
                      end
-                    ).
+                    ),
+  ok.
 
 create_tables() ->
   mnesia:create_table(sc_store, [{attributes, record_info(fields, sc_store)}, {index, [pid]}]).
