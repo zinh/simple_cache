@@ -2,18 +2,20 @@
 -export([lookup/1, insert/2, init/0, delete/1]).
 
 -define(DEFAULT_LEASE_TIME, 5000).
--define(TABLE_ID, ?MODULE).
+
+-record(sc_store, {key, pid}).
 
 init() ->
-  ets:new(?TABLE_ID, [public, named_table]),
+  mnesia:start(),
+  create_tables(),
   ok.
 
 insert(Key, Pid) ->
-  ets:insert(?TABLE_ID, {Key, Pid}).
+  mnesia:dirty_write(sc_store, #sc_store{key=Key, pid=Pid}).
 
 lookup(Key) ->
-  case ets:lookup(?TABLE_ID, Key) of
-    [ {Key, Pid} | _ ] ->
+  case mnesia:read(sc_store, Key) of
+    [#{pid=Pid}] ->
       {ok, Pid};
     _ ->
       {error, not_found}
@@ -21,3 +23,6 @@ lookup(Key) ->
 
 delete(Pid) ->
   ets:match_delete(?TABLE_ID, {'_', Pid}).
+
+create_tables() ->
+  mnesia:create_table(sc_store, [{attributes, record_info(fields, sc_store)}]).

@@ -102,14 +102,16 @@ add_resource(Type, Resource, ResourceTuples) ->
       dict:store(Type, [Resource], ResourceTuples)
   end.
 
+add_resources(_FilteredNodes, _Founds) ->
+  ok.
+
 resource_for_types(TargetTypes, RemoteTuples) ->
-  Fun = 
-  fun(Type, Acc) ->
-      case dict:find(Type, RemoteTuples) of
-        {ok, List} ->
-          [{Type, Instance} || Instance <- List] ++ Acc;
-        error ->
-          Acc
-      end
-  end,
-  lists:foldl(Fun, [], Types).
+  Fun = fun(Type, Acc) ->
+            case dict:find(Type, RemoteTuples) of
+              {ok, List} ->
+                [{Type, Instance} || Instance <- List] ++ Acc;
+              error ->
+                Acc
+            end
+        end,
+  lists:foldl(Fun, [], TargetTypes).
