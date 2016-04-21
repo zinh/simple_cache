@@ -15,7 +15,7 @@ insert(Key, Value, LeaseTime) ->
   sc_event:create(Key, Value),
   case sc_store:lookup(Key) of
     {ok, Pid} ->
-      sc_element:replace(Pid, Value);
+      sc_element:replace(Pid, Value, LeaseTime);
     {error, _} ->
       {ok, Pid} = sc_element:create(Value, LeaseTime),
       sc_store:insert(Key, Pid)

@@ -15,7 +15,7 @@
 %%====================================================================
 
 start(_StartType, _StartArgs) ->
-  ok = ensure_contact(),
+  %% ok = ensure_contact(),
   sc_store:init(),
   case sc_sup:start_link() of
     {ok, Pid} -> {ok, Pid};
@@ -48,3 +48,9 @@ ensure_contact(Nodes) ->
       WaitTime = get_env(simple_cache, wait_time, DefaultTime),
       wait_for_nodes(length(Answering), WaitTime)
   end.
+
+get_env(_Type, _Name, _Var) ->
+  ok.
+
+wait_for_nodes(_Length, _Time) ->
+  ok.
