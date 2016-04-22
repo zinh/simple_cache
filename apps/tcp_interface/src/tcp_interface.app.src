@@ -1,5 +1,5 @@
 {application, tcp_interface,
- [{description, "An OTP application"},
+ [{description, "TCP Interface for simple_cache"},
   {vsn, "0.1.0"},
   {registered, [tcp_interface_sup]},
   {mod, { tcp_interface_app, []}},
@@ -7,7 +7,7 @@
    [kernel,
     stdlib
    ]},
-  {env,[]},
+  {env,[{port, 8080}]},
   {modules, [tcp_interface_app, tcp_interface_sup]},
 
   {maintainers, []},

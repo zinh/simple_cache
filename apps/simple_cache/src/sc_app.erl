@@ -49,8 +49,11 @@ ensure_contact(Nodes) ->
       wait_for_nodes(length(Answering), WaitTime)
   end.
 
-get_env(_Type, _Name, _Var) ->
-  ok.
+get_env(Type, Name, DefaultVal) ->
+  case application:get_env(Type, Name) of
+    {ok, Val} -> Val;
+    undefined -> DefaultVal
+  end.
 
 wait_for_nodes(_Length, _Time) ->
   ok.

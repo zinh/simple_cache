@@ -2,7 +2,7 @@
  [{description, "Simple Cache"},
   {vsn, "0.1.0"},
   {registered, [sc_sup]},
-  {mod, { sc_app, []}},
+  {mod, {sc_app, []}},
   {applications,
    [kernel,
     stdlib
