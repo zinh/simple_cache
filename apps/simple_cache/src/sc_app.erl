@@ -15,7 +15,6 @@
 %%====================================================================
 
 start(_StartType, _StartArgs) ->
-  io:format("simple cache started"),
   %% ok = ensure_contact(),
   sc_store:init(),
   case sc_sup:start_link() of
