@@ -1,0 +1,2 @@
+-module(gws_connection_sup).
+-export([]).
