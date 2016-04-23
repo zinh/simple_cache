@@ -33,7 +33,7 @@ handle_info({tcp_closed, _Socket}, State) ->
   {stop, normal, State};
 
 handle_info({tcp, Socket, RawData}, State) ->
-  gen_tcp:send(Socket, RawData),
+  reply(RawData, Socket),
   {noreply, State}.
 
 terminate(_Reason, _State) ->
@@ -41,3 +41,35 @@ terminate(_Reason, _State) ->
 
 code_change(_OldVsn, State, _Extra) ->
   {ok, State}.
+
+%% Private function
+reply(RawData, Socket) ->
+  {Op, Params} = parse_fa(RawData),
+  case Op of
+    "insert" ->
+      [Key | Value] = Params,
+      case apply(simple_cache, insert, [Key, Value]) of
+        ok ->
+          gen_tcp:send(Socket, io_lib:fwrite("OK~n", []));
+        _Other ->
+          gen_tcp:send(Socket, io_lib:fwrite("ERROR~n", []))
+      end;
+    "lookup" ->
+      case apply(simple_cache, lookup, Params) of
+        failed -> gen_tcp:send(Socket, io_lib:fwrite("ERROR~n", []));
+        Result -> gen_tcp:send(Socket, io_lib:fwrite("~p~n", [Result]))
+      end;
+    _Other ->
+      gen_tcp:send(Socket, "Unsupported operator")
+  end.
+
+
+
+%% insert(key, val)
+%% lookup(key)
+%%   -> OK:{key, val}
+%%   -> ERROR: msg
+parse_fa(RawData) ->
+  Data = re:replace(RawData, "(^\\s+)|(\\s+$)", "", [global,{return,list}]),
+  [Op | Params] = re:split(Data, "[(),]", [{return, list}, trim]),
+  {Op, Params}.
