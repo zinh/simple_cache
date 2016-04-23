@@ -1,4 +1,4 @@
 compile:
 	rebar3 compile
-shell: compile
+shell:
 	rebar3 shell
