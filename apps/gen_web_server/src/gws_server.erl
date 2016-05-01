@@ -26,7 +26,7 @@ handle_info({http, _Socket, http_eoh}, #state{content_remaining=0} = State) ->
   {stop, normal, handle_http_request(State)};
 
 handle_info({http, _Socket, http_eoh}, State) ->
-  inet:setopts(State#state.socket, [{accept, once}, {packet, raw}]),
+  inet:setopts(State#state.socket, [{active, once}, {packet, raw}]),
   {noreply, State};
 
 handle_info({tcp, _Socket, RawData}, State) when is_binary(RawData) ->
@@ -62,8 +62,8 @@ handle_cast(_Request, State) ->
   {noreply, State}.
 
 %% Private
-header("Content-Length" = Name, Length, #state{headers = Headers} = State) ->
-  ContentLength = State#state.content_remaining - list_to_integer(binary_to_list(Length)),
+header('Content-Length' = Name, Length, #state{headers = Headers} = State) ->
+  ContentLength = list_to_integer(binary_to_list(Length)),
   State#state{headers = [{Name, Length} | Headers], content_remaining = ContentLength};
 
 header(Name, Value, #state{headers=Headers} = State) ->
@@ -86,4 +86,7 @@ dispatch('GET', Path, Body, Callback, UserData) ->
   Callback:get(Path, Body, UserData);
 
 dispatch('PUT', Path, Body, Callback, UserData) ->
-  Callback:put(Path, Body, UserData).
+  Callback:put(Path, Body, UserData);
+
+dispatch('DELETE', Path, Body, Callback, UserData) ->
+  Callback:delete(Path, Body, UserData).

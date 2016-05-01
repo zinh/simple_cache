@@ -48,4 +48,7 @@ response(200) ->
   "200 OK";
 
 response(404) ->
-  "404 Not Found".
+  "404 Not Found";
+
+response(500) ->
+  "500 Internal Error".
