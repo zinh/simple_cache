@@ -10,7 +10,7 @@ start_link(Callback, IP, Port, UserArgs) ->
   {ok, Pid}.
 
 start_child(Server) ->
-  supervisor:start_link(Server, []).
+  supervisor:start_child(Server, []).
 
 init([Callback, IP, Port, UserArgs]) ->
   BasicSockOps = [binary, 
@@ -21,7 +21,9 @@ init([Callback, IP, Port, UserArgs]) ->
     undefined -> BasicSockOps;
     _Other -> [{ip, IP} | BasicSockOps]
   end,
+  io:format("Socket starting~n"),
   {ok, LSock} = gen_tcp:listen(Port, SockOps),
+  io:format("Socket started~n"),
   Server = {gws_server, {gws_server, start_link, [Callback, LSock, UserArgs]}, temporary, brutal_kill, worker, [gws_server]},
   RestartStategry = {simple_one_for_one, 0, 1},
   {ok, {RestartStategry, [Server]}}.

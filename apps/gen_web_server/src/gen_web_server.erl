@@ -37,7 +37,7 @@ http_reply(Code) ->
   http_reply(Code, <<>>).
 
 http_reply(Code, Body) ->
-  http_reply(Code, [{"Content-Type: text/html"}], Body).
+  http_reply(Code, [{"Content-Type", "text/html"}], Body).
 
 headers([{Key, Val} | Headers]) ->
   [io_lib:format("~s: ~s\r\n", [Key, Val]) | headers(Headers)];

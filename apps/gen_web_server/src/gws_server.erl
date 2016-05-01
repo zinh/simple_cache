@@ -6,7 +6,7 @@
 -record(state, {lsock, socket, request_line, headers=[], body = <<>> , content_remaining=0, callback, user_data, parent}).
 
 start_link(Callback, LSock, UserArgs) ->
-  gen_server:init(?MODULE, [Callback, LSock, UserArgs, self()], []).
+  gen_server:start_link(?MODULE, [Callback, LSock, UserArgs, self()], []).
 
 init([Callback, LSock, UserArgs, Parent]) ->
   {ok, UserData} = Callback:init(UserArgs),
@@ -14,8 +14,9 @@ init([Callback, LSock, UserArgs, Parent]) ->
   {ok, State, 0}.
 
 handle_info({http, _Socket, {http_request, Action, Path, _Version}}, State) ->
+  {abs_path, AbsPath} = Path,
   inet:setopts(State#state.socket, [{active, once}]),
-  {noreply, State#state{request_line={Action, Path}}};
+  {noreply, State#state{request_line={Action, binary_to_list(AbsPath)}}};
 
 handle_info({http, _Socket, {http_header, _Length, Name, _ReservedField, Value}}, State) ->
   inet:setopts(State#state.socket, [{active, once}]),
@@ -81,8 +82,8 @@ handle_http_request(#state{body=Body,
   end,
   NewState.
 
-dispatch("GET", Path, Body, Callback, UserData) ->
+dispatch('GET', Path, Body, Callback, UserData) ->
   Callback:get(Path, Body, UserData);
 
-dispatch("PUT", Path, Body, Callback, UserData) ->
+dispatch('PUT', Path, Body, Callback, UserData) ->
   Callback:put(Path, Body, UserData).
