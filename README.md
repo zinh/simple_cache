@@ -14,7 +14,7 @@ Run
     $ rebar3 shell
     erl> application:start(simple_cache).
 
-Interface
+CLI Interface
 -----
 
     erl> simple_cache:lookup(a_key).
@@ -23,3 +23,14 @@ Interface
     ok
     erl> simple_cache:lookup(a_key).
     a_value
+
+HTTP Interface
+-----
+
+```
+# Lookup
+curl http://localhost/<key>
+
+# Insert
+curl -X PUT -d <value> http://localhost/<key>
+```
