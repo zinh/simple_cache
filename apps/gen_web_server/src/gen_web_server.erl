@@ -1,7 +1,7 @@
 -module(gen_web_server).
 
 %% API exports
--export([behaviour_info/1]).
+-export([behaviour_info/1, start_link/3, start_link/4, http_reply/3, http_reply/2, http_reply/1]).
 -export([headers/1]).
 
 %%====================================================================

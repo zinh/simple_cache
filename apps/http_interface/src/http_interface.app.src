@@ -1,0 +1,17 @@
+{application, http_interface,
+ [{description, "HTTP Interface for Simple Cache"},
+  {vsn, "0.1.0"},
+  {registered, []},
+  {mod, { http_interface_app, []}},
+  {applications,
+   [kernel,
+    stdlib,
+    gen_web_server
+   ]},
+  {env,[]},
+  {modules, [http_interface_app, http_interface_sup]},
+
+  {maintainers, []},
+  {licenses, []},
+  {links, []}
+ ]}.

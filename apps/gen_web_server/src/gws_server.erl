@@ -1,7 +1,7 @@
 -module(gws_server).
 -behaviour(gen_server).
 -export([start_link/3]).
--export([init/1, handle_info/2, terminate/2, code_change/3]).
+-export([init/1, handle_info/2, terminate/2, code_change/3, handle_call/3, handle_cast/2]).
 
 -record(state, {lsock, socket, request_line, headers=[], body = <<>> , content_remaining=0, callback, user_data, parent}).
 
@@ -54,6 +54,12 @@ terminate(_Reason, _State) ->
 code_change(_OldVsn, State, _Extra) ->
   {ok, State}.
 
+handle_call(_Request, _From, State) ->
+  {noreply, State}.
+
+handle_cast(_Request, State) ->
+  {noreply, State}.
+
 %% Private
 header("Content-Length" = Name, Length, #state{headers = Headers} = State) ->
   ContentLength = State#state.content_remaining - list_to_integer(binary_to_list(Length)),
@@ -66,12 +72,17 @@ handle_http_request(#state{body=Body,
     request_line={Action, Path}, 
     user_data=UserData,
     callback=Callback} = State) ->
-  Reply = dispatch(Action, Path, Body, Callback),
-  gen_tcp:send(State#state.socket, Reply),
-  State.
+  case dispatch(Action, Path, Body, Callback, UserData) of
+    {reply, Reply, NewUserData} ->
+      gen_tcp:send(State#state.socket, Reply),
+      NewState = State#state{user_data = NewUserData};
+    {noreply, NewUserData} ->
+      NewState = State#state{user_data = NewUserData}
+  end,
+  NewState.
 
-dispatch("GET", Path, Callback) ->
-  Callback:get(Path, UserData);
+dispatch("GET", Path, Body, Callback, UserData) ->
+  Callback:get(Path, Body, UserData);
 
-dispatch("PUT", Path, Body, Callback) ->
-  Callback:put(Path, Body).
+dispatch("PUT", Path, Body, Callback, UserData) ->
+  Callback:put(Path, Body, UserData).
