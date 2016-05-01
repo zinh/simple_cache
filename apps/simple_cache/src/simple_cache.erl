@@ -1,5 +1,5 @@
 -module(simple_cache).
--export([insert/2, insert/3, lookup/1]).
+-export([insert/2, insert/3, lookup/1, delete/1]).
 
 insert(Key, Value) ->
   sc_event:create(Key, Value),
@@ -28,4 +28,12 @@ lookup(Key) ->
       sc_element:get_value(Pid);
     {error, _} ->
       failed
+  end.
+
+delete(Key) ->
+  case sc_store:lookup(Key) of
+    {ok, Pid} ->
+      sc_element:delete(Pid);
+    {error, _} ->
+      ok
   end.

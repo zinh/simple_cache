@@ -2,7 +2,7 @@
 -behaviour(gen_web_server).
 
 -export([start_link/1]).
--export([init/1, get/3, put/3]).
+-export([init/1, get/3, put/3, delete/3]).
 
 start_link(Port) ->
   gen_web_server:start_link(?MODULE, Port, []).
@@ -22,7 +22,15 @@ get(Path, _Body, _UserData) ->
 put(Path, Body, _UserData) ->
   Key = path_to_key(Path),
   Reply = case apply(simple_cache, insert, [Key, Body]) of
-    ok -> gen_web_server:http_reply(200, "OK");
+    ok -> gen_web_server:http_reply(200, "OK\n");
+    _ -> gen_web_server:http_reply(500, "Failed\n")
+  end,
+  {reply, Reply, []}.
+
+delete(Path, _Body, _UserData) ->
+  Key = path_to_key(Path),
+  Reply = case apply(simple_cache, delete, [Key]) of
+    ok -> gen_web_server:http_reply(200, "OK\n");
     _ -> gen_web_server:http_reply(500, "Failed\n")
   end,
   {reply, Reply, []}.
